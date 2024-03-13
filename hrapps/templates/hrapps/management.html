@@ -191,12 +191,12 @@
                                                 <a href="{% url 'hrapps:view' app.id %}" class="btn btn-primary">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </a>
-
-                                                {% if perms.hrapplications.delete_application %}
+                                                <!-- No Deleting -->
+                                                <!-- {% if perms.hrapplications.delete_application %}
                                                     <a href="{% url 'hrapps:remove' app.id %}" class="btn btn-danger">
                                                         <i class="fa-solid fa-trash-can"></i>
                                                     </a>
-                                                {% endif %}
+                                                {% endif %} -->
                                             </td>
                                         </tr>
                                     {% endfor %}

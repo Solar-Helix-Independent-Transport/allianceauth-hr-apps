@@ -103,9 +103,10 @@
                                 {% if perms.hrapps.reject_application %}
                                     <a href="{% url 'hrapps:reject' app.id %}" class="btn btn-warning">{% translate "Reject" %}</a>
                                 {% endif %}
-                                {% if perms.hrapps.delete_application %}
+                                <!-- No Deleting -->
+                                <!-- {% if perms.hrapps.delete_application %}
                                     <a href="{% url 'hrapps:remove' app.id %}" class="btn btn-danger">{% translate "Delete" %}</a>
-                                {% endif %}
+                                {% endif %} -->
                             {% elif not app.reviewer %}
                                 <a href="{% url 'hrapps:mark_in_progress' app.id %}" class="btn btn-warning">{% translate "Mark in Progress" %}</a>
                             {% endif %}
