@@ -12,7 +12,7 @@ class ApplicationsMenu(MenuItemHook):
     def __init__(self):
         MenuItemHook.__init__(
             self,
-            _('Applications2'),
+            _('Applications'),
             'fa-regular fa-file',
             'hrapps:index',
             navactive=['hrapps:'])
