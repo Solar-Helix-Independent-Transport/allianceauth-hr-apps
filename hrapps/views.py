@@ -20,6 +20,29 @@ logger = logging.getLogger(__name__)
 VIEW_PERM = "hrapps.create_new_application"
 MANAGE_PERM = "hrapps.approve_application"
 
+def run_checks(test_user, filters):
+    output = []
+    for f in filters:
+        try:
+            _f = f.filter_object
+            f_data = {}
+            if hasattr(_f, "process_field"):
+                f_data = _f.process_field(User.objects.filter(id=test_user.id))
+            elif hasattr(_f, "audit_filter"):
+                logger.debug(
+                    f"{_f} has no process_field, falling back to audit_filter")
+                f_data = _f.audit_filter(User.objects.filter(id=test_user.id))
+            output.append(
+                {
+                    "title": _f.description,
+                    "check": f_data[test_user.id]['check'],
+                    "data":  f_data[test_user.id]['message']
+                }
+            )
+        except Exception as e: 
+            logger.exception(e)
+    return output
+
 @login_required
 @permission_required(VIEW_PERM)
 def hr_application_management_view(request):
@@ -92,6 +115,7 @@ def hr_application_personal_view(request, app_id):
             'buttons': False,
             'comments': ApplicationComment.objects.filter(application=app),
             'comment_form': HRApplicationCommentForm(),
+            'filters': run_checks(app.user, app.form.filters.all())
         }
         return render(request, 'hrapps/view.html', context=context)
     else:

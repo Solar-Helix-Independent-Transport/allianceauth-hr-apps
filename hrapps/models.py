@@ -1,9 +1,12 @@
+from typing import override
+
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from sortedm2m.fields import SortedManyToManyField
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
-
 from .managers import ApplicationManager, ApplicationFormManager
 
 
@@ -12,8 +15,9 @@ class ApplicationQuestion(models.Model):
     help_text = models.CharField(max_length=254, blank=True, null=True)
     multi_select = models.BooleanField(default=False)
 
-    def __str__(self):
-        return "Question: " + self.title
+    @override
+    def __str__(self) -> str:
+        return f"Question: {self.title}"
 
 
 class ApplicationChoice(models.Model):
@@ -21,8 +25,33 @@ class ApplicationChoice(models.Model):
         ApplicationQuestion, on_delete=models.CASCADE, related_name="choices")
     choice_text = models.CharField(max_length=200, verbose_name='Choice')
 
+    @override
+    def __str__(self) -> str:
+        return str(self.choice_text)
+
+
+class FilterDataSource(models.Model):
+    content_type = models.ForeignKey(
+        to=ContentType,
+        on_delete=models.CASCADE,
+        editable=False
+    )
+    object_id = models.PositiveIntegerField(
+        editable=False
+    )
+    filter_object = GenericForeignKey(
+        ct_field="content_type",
+        fk_field="object_id"
+    )
+
     def __str__(self):
-        return self.choice_text
+        try:
+            return f"{self.filter_object.name}: {self.filter_object.description}"
+        except:
+            return f"Error: {self.content_type.app_label}:{self.content_type} {self.object_id}"
+
+    class Meta:
+        default_permissions = []
 
 
 class ApplicationForm(models.Model):
@@ -31,7 +60,10 @@ class ApplicationForm(models.Model):
 
     objects = ApplicationFormManager()
 
-    def __str__(self):
+    filters = models.ManyToManyField(FilterDataSource)
+
+    @override
+    def __str__(self) -> str:
         return str(self.corp)
 
 
@@ -49,8 +81,9 @@ class Application(models.Model):
 
     objects = ApplicationManager()
 
-    def __str__(self):
-        return str(self.user) + " Application To " + str(self.form)
+    @override
+    def __str__(self) -> str:
+        return f"{self.user} Application To {self.form}"
 
     class Meta:
         permissions = (
@@ -58,23 +91,21 @@ class Application(models.Model):
             ('reject_application', 'Can reject visible applications'),
             ('create_new_application', 'Can view and send applications'),
             ('view_all_applications', 'Can view all applications'),
-            ('view_corp_applications',
-             'Can view apps to any corporation your a member of'),
-            ('view_alt_corp_applications',
-             'Can view apps to main characters corporation'),
+            ('view_corp_applications', 'Can view apps to main characters corporation'),
+            ('view_alt_corp_applications', 'Can view apps to any corporation your a member of'),
         )
         # unique_together = ('form', 'user')
 
     @property
-    def main_character(self):
+    def main_character(self) -> str:
         return self.user.profile.main_character
 
     @property
-    def characters(self):
+    def characters(self) -> list[EveCharacter]:
         return [o.character for o in self.user.character_ownerships.all()]
 
     @property
-    def reviewer_str(self):
+    def reviewer_str(self) -> str | None:
         if self.reviewer_character:
             return str(self.reviewer_character)
         elif self.reviewer:
@@ -89,8 +120,8 @@ class ApplicationResponse(models.Model):
         Application, on_delete=models.CASCADE, related_name='responses')
     answer = models.TextField()
 
-    def __str__(self):
-        return str(self.application) + " Answer To " + str(self.question)
+    def __str__(self) -> str:
+        return f"{self.application} Answer To {self.question}"
 
     class Meta:
         unique_together = ('question', 'application')
@@ -103,5 +134,7 @@ class ApplicationComment(models.Model):
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return str(self.user) + " comment on " + str(self.application)
+    @override
+    def __str__(self) -> str:
+        return f"{self.user} comment on {self.application}"
+

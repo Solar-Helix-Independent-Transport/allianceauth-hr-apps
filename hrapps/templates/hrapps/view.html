@@ -51,6 +51,30 @@
 
         <div class="card mb-3">
             <div class="card-header bg-info">
+                <div class="card-title mb-0">{% translate "Checks" %}</div>
+            </div>
+
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th>{% translate "Description" %}</th>
+                        <th>{% translate "Pass/Fail" %}</th>
+                        <th>{% translate "Note" %}</th>
+                    </tr>
+
+                    {% for f in filters %}
+                        <tr>
+                            <td>{{ f.title }}</td>
+                            <td>{{ f.check }}</td>
+                            <td>{{ f.data }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header bg-info">
                 <div class="card-title mb-0">{% translate "Characters" %}</div>
             </div>
 

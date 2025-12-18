@@ -1,7 +1,9 @@
 from django.contrib import admin
 
-from .models import Application, ApplicationChoice, ApplicationComment, ApplicationForm, ApplicationQuestion, \
-    ApplicationResponse
+from .models import (
+    Application, ApplicationChoice, ApplicationComment, 
+    ApplicationForm, ApplicationQuestion, ApplicationResponse
+)
 
 
 class ChoiceInline(admin.TabularInline):
@@ -19,7 +21,13 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [ChoiceInline]
 
 
+class FormAdmin(admin.ModelAdmin):
+    filter_horizontal = [
+        "filters",
+    ]
+
+
 admin.site.register(Application)
 admin.site.register(ApplicationComment)
-admin.site.register(ApplicationForm)
+admin.site.register(ApplicationForm, FormAdmin)
 admin.site.register(ApplicationResponse)
