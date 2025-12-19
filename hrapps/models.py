@@ -1,4 +1,4 @@
-from typing import override
+# from typing import override
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -15,7 +15,7 @@ class ApplicationQuestion(models.Model):
     help_text = models.CharField(max_length=254, blank=True, null=True)
     multi_select = models.BooleanField(default=False)
 
-    @override
+    # @override
     def __str__(self) -> str:
         return f"Question: {self.title}"
 
@@ -25,7 +25,7 @@ class ApplicationChoice(models.Model):
         ApplicationQuestion, on_delete=models.CASCADE, related_name="choices")
     choice_text = models.CharField(max_length=200, verbose_name='Choice')
 
-    @override
+    # @override
     def __str__(self) -> str:
         return str(self.choice_text)
 
@@ -62,7 +62,7 @@ class ApplicationForm(models.Model):
 
     filters = models.ManyToManyField(FilterDataSource)
 
-    @override
+    # @override
     def __str__(self) -> str:
         return str(self.corp)
 
@@ -81,7 +81,7 @@ class Application(models.Model):
 
     objects = ApplicationManager()
 
-    @override
+    # @override
     def __str__(self) -> str:
         return f"{self.user} Application To {self.form}"
 
@@ -134,7 +134,7 @@ class ApplicationComment(models.Model):
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
 
-    @override
+    # @override
     def __str__(self) -> str:
         return f"{self.user} comment on {self.application}"
 
